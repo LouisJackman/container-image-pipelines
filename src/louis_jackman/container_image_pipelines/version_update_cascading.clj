@@ -46,20 +46,24 @@
                                                  "\\d+ \\."
                                                  "\\d+"
                                                  "(?<rest> .*)"))
+
+        replace-line (fn [line]
+                       (if-let [[_ from-clause rest]
+                                (re-matches from-image-with-version line)]
+                         (str from-clause
+                              to-version
+                              rest
+                              system-newline)
+                         (throw (ex-info "standard version tag missing"
+                                         {:image-derivation line
+                                          :context context}))))
+
         replace-lines (fn [lines]
-                        (->> lines
-                             (map (fn [line]
-                                    (if (re-find from-image line)
-                                      (if-let [[_ from-clause rest]
-                                               (re-matches from-image-with-version line)]
-                                        (str from-clause
-                                             to-version
-                                             rest
-                                             system-newline)
-                                        (throw (ex-info "standard version tag missing"
-                                                        {:image-derivation line
-                                                         :context context})))
-                                      (str line system-newline))))))]
+                        (for [line lines
+                              :let [original-line (str line system-newline)]]
+                          (if (re-find from-image line)
+                            (replace-line line)
+                            original-line)))]
     (with-open [dockerfile (-> context
                                .toPath
                                (.resolve "Dockerfile")
@@ -79,8 +83,13 @@
   [& {:keys [context]}]
   (let [{:keys [version]} (lookup-context-info context)]
     (if-let [[_ patch] (re-find patch-version-pattern version)]
-      (->> patch parse-long inc str (string/replace version #"\d+$"))
-      (throw (ex-info "invalid version string" {:string version})))))
+      (->> patch
+           parse-long
+           inc
+           str
+           (string/replace version #"\d+$"))
+      (throw (ex-info "invalid version string"
+                      {:string version})))))
 
 (defn- backup-and-replace
   "Backup a file, using a `.bk` suffix. Then replace the original with
@@ -98,8 +107,12 @@
   bumping the reference's versions to `to-version`. In turn, bump the versions
   of the modified contexts to reflect that."
   [& {:keys [project-dir to-version parent]}]
+
   (doseq [^File context (sort-contexts project-dir)]
-    (let [dockerfile (-> context .toPath (.resolve "Dockerfile") .toFile)
+    (let [dockerfile (-> context
+                         .toPath
+                         (.resolve "Dockerfile")
+                         .toFile)
           {:keys [version] :as context-meta} (lookup-context-info context)
           dockerfile-replacement (replace-dockerfile :context context
                                                      :parent-image parent

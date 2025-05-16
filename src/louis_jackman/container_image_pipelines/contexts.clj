@@ -15,14 +15,16 @@
 
 
 (defn- strip-ordering-prefix
-  "Strip the prefix used to denote context build orders, e.g. `01` in `01-image-to-build`."
-  [s] (string/replace-first s #"(?x) ^ ( \d+ - )" ""))
+  "Strip the prefix used to denote context build orders, e.g. `01` in
+  `01-image-to-build`."
+  [s]
+  (string/replace-first s #"(?x) ^ ( \d+ - )" ""))
 
 (defn name-from-context
   "Derive a context's from its directory name, discarding other information it
   embeds e.g. build ordering."
   [context]
-  (-> context File/.getName strip-ordering-prefix))
+  (-> context .getName strip-ordering-prefix))
 
 
 (def ^:private dockerfile-name "Dockerfile")
@@ -32,12 +34,12 @@
   "Throw an exception if the provided context directory does not contain the
   necessary files to be inspected and potentially built."
   [context]
-  (when-not (-> (io/file context dockerfile-name) .exists)
+  (when-not (.exists (io/file context dockerfile-name))
     (throw (ex-info (str "all context directories must contain `"
                          dockerfile-name
                          "`, but it is missing here")
                     {:dir context})))
-  (when-not (-> (io/file context info-file-name) .exists)
+  (when-not (.exists (io/file context info-file-name))
     (throw (ex-info (str "all context directories must contain `"
                          info-file-name
                          "`, but it is missing here")

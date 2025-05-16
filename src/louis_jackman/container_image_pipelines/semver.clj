@@ -13,7 +13,8 @@
   (str major \. minor \. patch))
 
 
-(def ^:private semantic-version-pattern #"(?x) ^ (\d+) \. (\d+) \. (\d+) $")
+(def ^:private semantic-version-pattern
+  #"(?x) ^ (\d+) \. (\d+) \. (\d+) $")
 
 (defn string->SemanticVersion [s]
   (let [matches (re-matches semantic-version-pattern s)]

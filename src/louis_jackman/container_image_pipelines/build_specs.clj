@@ -28,7 +28,8 @@
      push])
 
 (defn- context-dir->BuildSpec-defaults
-  "Use metadata in a context directory to derive defaults for a build specification."
+  "Use metadata in a context directory to derive defaults for a build
+  specification."
   [context-dir]
   (let [{:keys [version platforms]} (lookup-context-info context-dir)
         image-name (name-from-context context-dir)]
@@ -71,7 +72,8 @@
                    latest-ImageRef
                    ImageRef->string)
         platform-flags (if (and push (not only-local-platform))
-                         [(str "--platform=" (string/join \, target-platforms))]
+                         [(str "--platform=" (string/join \,
+                                                          target-platforms))]
                          [])
         provenance-flags (if add-provenance
                            []

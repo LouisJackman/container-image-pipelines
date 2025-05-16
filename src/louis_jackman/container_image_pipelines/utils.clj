@@ -27,11 +27,11 @@
   (let [status (wait-for-proc proc)
         command (-> proc .info .commandLine (.orElse nil))]
     (if-not (zero? status)
-      (throw (ex-info "process failed"
-                      (merge {:status status}
-                             (if command
+      (let [ex-data (merge {:status status}
+                           (if command
                                {:command command}
-                               {})))))))
+                               {}))]
+      (throw (ex-info "process failed" ex-data))))))
 
 (defn docker
   "Run the `docker` process."

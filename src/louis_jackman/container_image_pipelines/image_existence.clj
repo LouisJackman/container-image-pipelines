@@ -36,7 +36,8 @@
                    (map #(string/split % #"\s+"))
                    (map (partial take 2))
                    (some (fn [[parsed-name parsed-tag]]
-                           (and (= parsed-name name) (= parsed-tag tag)))))]
+                           (and (= parsed-name name)
+                                (= parsed-tag tag)))))]
     (and (zero? (wait-for-proc proc))
          match)))
 
@@ -64,13 +65,13 @@
   (let [proto (if force-secure-inspections "https" "http")
         url (str proto "://" registry "/v2/" image-name "/tags/list")
         uri (-> url io/as-url .toURI)
-        req (-> uri HttpRequest/newBuilder .build)]
-
-      (let [resp (.send *http-client* req (HttpResponse$BodyHandlers/ofInputStream))]
-        (with-open [body (-> resp .body io/reader)]
-          (and (http-resp-ok? resp)
-               (let [tags (-> body json/read (get "tags"))]
-                 (some (partial = tag) tags)))))))
+        req (-> uri HttpRequest/newBuilder .build)
+        body-handler (HttpResponse$BodyHandlers/ofInputStream)
+        resp (.send *http-client* req body-handler)]
+    (with-open [body (-> resp .body io/reader)]
+      (and (http-resp-ok? resp)
+           (let [tags (-> body json/read (get "tags"))]
+             (some (partial = tag) tags))))))
 
 (defn registry-image-exists?
   "Does an image exist in the registry, according to _either_ `docker manifest

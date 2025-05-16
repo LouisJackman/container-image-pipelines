@@ -83,6 +83,7 @@
                :image-existence-checker checker
                :image-builder image-builder
                :args extra-build-args)))]
+
     (with-open [http-client (HttpClient/newHttpClient)]
       (binding [*http-client* http-client]
 
@@ -107,9 +108,11 @@
                     error (try
                             (attempt-build context)
                             nil
-                            (catch Exception e e))]
-                (recur (if (nil? error) errors (conj errors error))
-                       rest-of-contexts)))))))))
+                            (catch Exception e e))
+                    accumulated-errors (if (nil? error)
+                                         errors
+                                         (conj errors error))]
+                (recur accumulated-errors rest-of-contexts)))))))))
 
 
 ;;;
@@ -121,6 +124,7 @@
   directory of container image definitions to understand which images (and
   versions) are expected."
   [& {:keys [project-dir registry secure-manifest-inspections]}]
+
   (let [checker (map->ImageExistenceChecker
                  {:force-secure-inspections secure-manifest-inspections})
         http-client (HttpClient/newHttpClient)]
@@ -145,7 +149,8 @@
             (println (str image-string
                           " is missing on the registry "
                           registry
-                          "; won't attempt to pull it into the local store"))))))))
+                          "; won't attempt to pull it into the local "
+                          "store"))))))))
 
 
 ;;;
@@ -159,6 +164,7 @@
              local-registry
              remote-registry
              secure-manifest-inspections]}]
+
   (let [checker (map->ImageExistenceChecker
                  {:force-secure-inspections secure-manifest-inspections})
         http-client (HttpClient/newHttpClient)]

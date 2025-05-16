@@ -106,28 +106,35 @@ images when patching a root base image.")
 (defn- parse-and-check-subcommand-opts [raw-args opt-specs subcommand]
   "Parse `raw-args` according to `opt-specs`. If a help-like flag is passed,
   provide help instead. Returns `[options rest helped]`; if `helped` is
-  non-`nil`, the caller can skip their usual operation and the other two
+  `true`, the caller can skip their usual operation and the other two
   arguments will be `nil`."
-  (let [usage (str system-newline
-                   (str "container-image-pipelines " subcommand)
-                   system-newline
-                   (->> opt-specs
-                        (map (fn [[_ arg desc & rest]]
-                               (let [default (->> rest
-                                                  (drop-while #(not= % :default))
-                                                  (drop 1)
-                                                  first)
-                                     default-usage (if (nil? default)
-                                                     ""
-                                                     (str " [" default "] "))
-                                     concise-arg (-> arg
-                                                     (string/split #"\s+")
-                                                     first)]
-                                 (str \tab concise-arg default-usage " — " desc system-newline))))
-                        string/join)
-                   system-newline)
+  (let [flags-usage (for [[_ arg desc & rest] opt-specs]
+                      (let [default (->> rest
+                                         (drop-while #(not= % :default))
+                                         (drop 1)
+                                         first)
+                            default-usage (if (nil? default)
+                                            [""]
+                                            [" [" default "] "])
+                            concise-arg (-> arg
+                                            (string/split #"\s+")
+                                            first)]
+                        (concat [\tab
+                                 concise-arg]
+                                default-usage
+                                [" — "
+                                 desc
+                                 system-newline])))
+        usage (->> [system-newline
+                    "container-image-pipelines " subcommand
+                    system-newline
+                    flags-usage
+                    [system-newline]]
+                   concat
+                   (apply str))
         opt-specs-with-help (conj opt-specs help-opt)
-        {rest :arguments :keys [options errors]} (parse-opts raw-args opt-specs-with-help)]
+        {rest :arguments :keys [options errors]} (parse-opts raw-args
+                                                             opt-specs-with-help)]
     (if (options :help)
       (do
         (println usage)
@@ -330,7 +337,7 @@ images when patching a root base image.")
            {:type :invalid-subcommand
             :expected-subcommands (sort expected-subcommands)}))
 
-(def on-invalid-subcommand []
+(defn- on-invalid-subcommand []
   (throw invalid-subcommand-exception))
 
 (defn- dispatch-subcommand
@@ -372,16 +379,21 @@ images when patching a root base image.")
                              ".")]
       (if-let [data (ex-data ex)]
         (let [info (case (data :type)
-                     :invalid-subcommand (do
-                                           (help-command)
-                                           (str "valid subcommands: "
-                                                (string/join ", " (data :expected-subcommands))))
-                     :invalid-arguments (do
-                                          (help-command)
-                                          (str "a correct subcommand, but it received invalid arguments:"
-                                               system-newline
-                                               (string/join (map (partial #(str "\t• " % system-newline))
-                                                                 (data :errors)))))
+
+                     :invalid-subcommand
+                     (do
+                       (help-command)
+                       (str "valid subcommands: "
+                            (string/join ", " (data :expected-subcommands))))
+
+                     :invalid-arguments
+                     (do
+                       (help-command)
+                       (str "a correct subcommand, but it received invalid "
+                            "arguments:"
+                            system-newline
+                            (string/join (map (partial #(str "\t• " % system-newline))
+                                              (data :errors)))))
                      (str data))]
           (println error-prelude)
           (println (str "More context: " info system-newline)))
