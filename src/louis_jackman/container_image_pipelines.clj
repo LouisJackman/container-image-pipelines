@@ -77,8 +77,11 @@ images when patching a root base image.")
   [nil "--default-platforms DEFAULT-PLATFORMS"
    "The default platforms to target, e.g. \"linux/arm64\". Comma-separate multiple platforms. Specific contexts can override this option if their build is not compatible on all default platforms. Furthermore, the `--only-local-platform` flag overrides both this flag and contexts' overrides."
    :default default-target-platforms
-   :parse-fn (comp (partial map string/trim)
-                   (partial string/split \,))])
+   :parse-fn (fn [arg]
+               (let [splitted (string/split arg #",")
+                     trimmed (map string/trim splitted)
+                     as-set (set trimmed)]
+                 as-set))])
 
 (def ^:private only-local-platform-opt
   [nil "--only-local-platform"
@@ -381,6 +384,8 @@ images when patching a root base image.")
                              (ex-message ex)
                              ".")]
       (if-let [data (ex-data ex)]
+
+        ;; If a known structured error, give a readable message.
         (let [info (case (data :type)
 
                      :invalid-subcommand
@@ -400,7 +405,10 @@ images when patching a root base image.")
                      (str data))]
           (println error-prelude)
           (println (str "More context: " info system-newline)))
-        (println error-prelude))))
+
+        ;; Otherwise, give the stacktrace.
+        (.printStackTrace ex))))
+
   (System/exit failure-status-code))
 
 

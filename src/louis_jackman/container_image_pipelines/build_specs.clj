@@ -78,8 +78,8 @@
                                                           target-platforms))]
                          [])
         provenance-flags (if add-provenance
-                           []
-                           ["--provenance=false"])
+                           ["--provenance=true"]
+                           [])
         storage-strategy-flag (if push "--push" "--load")
         dockerfile-flag (str "--file=" dockerfile-path)]
 
