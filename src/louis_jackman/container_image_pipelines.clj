@@ -114,23 +114,27 @@ images when patching a root base image.")
                                          first)
                             default-usage (if (nil? default)
                                             [""]
-                                            [" [" default "] "])
+                                            [" ["
+                                             (if (coll? default)
+                                               (string/join "," default)
+                                               default)
+                                             "] "])
                             concise-arg (-> arg
                                             (string/split #"\s+")
                                             first)]
-                        (concat [\tab
-                                 concise-arg]
-                                default-usage
-                                [" — "
-                                 desc
-                                 system-newline])))
-        usage (->> [system-newline
-                    "container-image-pipelines " subcommand
-                    system-newline
-                    flags-usage
-                    [system-newline]]
-                   concat
-                   (apply str))
+                        (apply concat
+                               [\tab
+                                concise-arg]
+                               default-usage
+                               [" — "
+                                desc
+                                system-newline])))
+        usage (string/join ""
+                           (apply concat [[system-newline
+                                           "container-image-pipelines " subcommand
+                                           system-newline]
+                                          (apply concat flags-usage)
+                                          [system-newline]]))
         opt-specs-with-help (conj opt-specs help-opt)
         {rest :arguments :keys [options errors]} (parse-opts raw-args
                                                              opt-specs-with-help)]
