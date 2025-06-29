@@ -28,6 +28,9 @@ RUN <<-EOF
         curl \
         git \
         libz-dev \
+        musl \
+        musl-dev \
+        musl-tools \
         "openjdk-$JDK_VERSION"-jre-headless
 
     rm -fr /var/lib/apt/lists/*
