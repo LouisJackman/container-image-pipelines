@@ -46,13 +46,10 @@ It ends up looking like this:
 │   │   ├── info.edn
 │   │   └── README.md
 │   ├── 02-java-dev
-│   │   ├── additional-configuration.el
 │   │   ├── Dockerfile
 │   │   └── info.edn
 │   ├── 03-clojure-dev
-│   │   ├── additional-configuration.el
 │   │   ├── Dockerfile
-│   │   ├── Dockerfile.bk
 │   │   └── info.edn
 │   └── README.md
 └── README.md
@@ -64,12 +61,15 @@ with versioning and automatic version-bumping on base image updates.
 
 **This tool does all of that.**
 
-Until native executables are produced and published, the tool must be invoked
-like this after [installing
+Get the `container-image-pipelines` executable from [the
+releases](https://gitlab.com/louis.jackman/container-image-pipelines/-/releases).
+Alternatively, get a platform-agnostic JAR if you already have a Java runtime
+installed. You can also run it from source using `clj -M -m
+louis-jackman.container-image-pipelines` after [installing
 Clojure](https://clojure.org/guides/install_clojure).
 
 ```
-$ clj -M -m louis-jackman.container-image-pipelines
+$ ./container-image-pipelines
 
 Build & publish a monorepo of co-dependent, multiarchitecture container images.
 
