@@ -1,0 +1,16 @@
+build:
+  image: docker:28.2.2
+  stage: build
+  services:
+    - docker:28.2.2-dind
+  script:
+    - docker buildx build -t container-image-pipelines-builder --load .
+    - docker run --rm -v "$PWD:/home/user/workspace" container-image-pipelines-builder
+    - mv target/container-image-pipelines "target/container-image-pipelines-$(uname -s | tr A-Z a-z)-$(uname -m)"
+    - docker rmi container-image-pipelines-builder
+
+  artifacts:
+    paths:
+      - target/container-image-pipelines.jar
+      - target/container-image-pipelines-linux-x86_64  # Update suffix if CI arch changes.
+

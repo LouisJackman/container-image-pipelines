@@ -1,7 +1,6 @@
 TODO:
 
-- [ ] Provide a release of a native, standalone executable using GraalVM. Or
-      at least just an uberjar so that just a JVM is needed.
+- [ ] Provide native builds for platforms other than Linux on AMD64.
 - [ ] Improve error messages by catching more specific exception types at
       top-level.
 - [ ] Replace explicit build ordering with resolved image dependency graphs.
