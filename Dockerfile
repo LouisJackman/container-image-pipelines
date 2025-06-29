@@ -94,6 +94,7 @@ ENV PATH="$PATH:/home/user/.local/graalvm-community-openjdk-${GRAALVM_VERSION}+9
 CMD clojure -T:build uberjar \
     && native-image \
         -jar target/container-image-pipelines.jar \
+        --enable-url-protocols=https \
         --no-fallback \
         --initialize-at-build-time \
         target/container-image-pipelines
