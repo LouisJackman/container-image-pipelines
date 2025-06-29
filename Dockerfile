@@ -95,6 +95,7 @@ CMD clojure -T:build uberjar \
     && native-image \
         -jar target/container-image-pipelines.jar \
         --static \
+        --libc=musl \
         --no-fallback \
         --initialize-at-build-time \
         target/container-image-pipelines
