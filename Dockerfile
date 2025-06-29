@@ -86,10 +86,15 @@ ENV PATH="$PATH:/home/user/.local/graalvm-community-openjdk-${GRAALVM_VERSION}+9
 # Now Clojure and GraalVM are installed, build the project's uberjar and then
 # compile it to native code.
 #
+# `--initialize-at-build-time` still seems necessary even with projects
+# installing `com.github.clj-easy/graal-build-time`. `--static` bakes in the
+# libc, avoiding crashes on distros utilising musl rather than glibc.
+#
 
 CMD clojure -T:build uberjar \
     && native-image \
         -jar target/container-image-pipelines.jar \
+        --static \
         --no-fallback \
         --initialize-at-build-time \
         target/container-image-pipelines
