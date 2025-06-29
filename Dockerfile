@@ -27,7 +27,8 @@ RUN <<-EOF
         ca-certificates \
         curl \
         git \
-        libz-dev \
+        zlib1g \
+        zlib1g-dev \
         musl \
         musl-dev \
         musl-tools \
