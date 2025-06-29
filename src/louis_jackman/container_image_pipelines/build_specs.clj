@@ -14,6 +14,8 @@
              :refer [ImageRef->string
                      latest-ImageRef]]))
 
+(set! *warn-on-reflection* true)
+
 
 
 (defrecord BuildSpec

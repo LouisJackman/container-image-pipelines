@@ -39,6 +39,8 @@
                           HttpResponse$BodyHandlers)
            (java.util.regex Pattern)))
 
+(set! *warn-on-reflection* true)
+
 
 
 ;;;
@@ -84,7 +86,7 @@
                :image-builder image-builder
                :args extra-build-args)))]
 
-    (with-open [http-client (HttpClient/newHttpClient)]
+    (with-open [^HttpClient http-client (HttpClient/newHttpClient)]
       (binding [*http-client* http-client]
 
         (if stop-on-first-error

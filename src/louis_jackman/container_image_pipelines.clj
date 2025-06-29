@@ -2,9 +2,6 @@
 ;;;; # container-image-pipelines
 ;;;;
 
-(set! *warn-on-reflection* true)
-
-
 (ns louis-jackman.container-image-pipelines
   (:gen-class)
   (:require [clojure.java.io :as io]
@@ -20,6 +17,8 @@
                      pull-from-registry
                      upload-to-local-registry
                      cascade-version-updates]]))
+
+(set! *warn-on-reflection* true)
 
 
 

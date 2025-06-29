@@ -4,6 +4,8 @@
 
 (ns louis-jackman.container-image-pipelines.images)
 
+(set! *warn-on-reflection* true)
+
 
 
 (def ^:private latest-tag "latest")

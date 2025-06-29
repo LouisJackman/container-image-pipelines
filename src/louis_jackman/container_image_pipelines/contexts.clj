@@ -12,6 +12,8 @@
   (:import (java.io File)
            (java.nio.file Files Path)))
 
+(set! *warn-on-reflection* true)
+
 
 
 (defn- strip-ordering-prefix
@@ -23,7 +25,7 @@
 (defn name-from-context
   "Derive a context's from its directory name, discarding other information it
   embeds e.g. build ordering."
-  [context]
+  [^File context]
   (-> context .getName strip-ordering-prefix))
 
 

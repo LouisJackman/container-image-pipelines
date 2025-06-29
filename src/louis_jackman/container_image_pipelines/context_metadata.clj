@@ -9,6 +9,8 @@
 
   (:import java.io.PushbackReader))
 
+(set! *warn-on-reflection* true)
+
 
 
 (def info-file-name "info.edn")

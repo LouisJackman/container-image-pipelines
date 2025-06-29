@@ -17,6 +17,8 @@
            java.nio.file.Files
            java.util.regex.Pattern))
 
+(set! *warn-on-reflection* true)
+
 
 
 (def ^:private ^Pattern from-clause-prefix

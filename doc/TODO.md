@@ -14,5 +14,3 @@ TODO:
       necessary in cases where a multi-stage image needs multiple sweeps
       to update multiple parent image references. Consider
       `clojure/core.cache`.)
-- [ ] Work out whether warning on reflection must be performed for every
-      single namespace separately.

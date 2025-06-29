@@ -16,6 +16,8 @@
 
   (:import (java.net.http HttpResponse$BodyHandlers HttpRequest)))
 
+(set! *warn-on-reflection* true)
+
 
 
 (defrecord ImageExistenceChecker

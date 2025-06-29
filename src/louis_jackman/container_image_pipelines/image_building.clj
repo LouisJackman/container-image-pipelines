@@ -16,6 +16,8 @@
             [louis-jackman.container-image-pipelines.image-existence
              :refer [local-image-exists? registry-image-exists?]]))
 
+(set! *warn-on-reflection* true)
+
 
 
 (def ^:private docker-build

@@ -4,6 +4,8 @@
 
 (ns louis-jackman.container-image-pipelines.semver)
 
+(set! *warn-on-reflection* true)
+
 
 
 (defrecord SemanticVersion [major minor patch])

@@ -6,6 +6,8 @@
   (:require [clojure.java.process :as process])
   (:import [java.net.http HttpClient HttpResponse]))
 
+(set! *warn-on-reflection* true)
+
 
 
 (def system-newline
