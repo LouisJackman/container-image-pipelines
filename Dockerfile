@@ -29,9 +29,6 @@ RUN <<-EOF
         git \
         zlib1g \
         zlib1g-dev \
-        musl \
-        musl-dev \
-        musl-tools \
         "openjdk-$JDK_VERSION"-jre-headless
 
     rm -fr /var/lib/apt/lists/*
@@ -91,15 +88,12 @@ ENV PATH="$PATH:/home/user/.local/graalvm-community-openjdk-${GRAALVM_VERSION}+9
 # compile it to native code.
 #
 # `--initialize-at-build-time` still seems necessary even with projects
-# installing `com.github.clj-easy/graal-build-time`. `--static` bakes in the
-# libc, avoiding crashes on distros utilising musl rather than glibc.
+# installing `com.github.clj-easy/graal-build-time`.
 #
 
 CMD clojure -T:build uberjar \
     && native-image \
         -jar target/container-image-pipelines.jar \
-        --static \
-        --libc=musl \
         --no-fallback \
         --initialize-at-build-time \
         target/container-image-pipelines
