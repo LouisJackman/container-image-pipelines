@@ -5,7 +5,7 @@
 (ns louis-jackman.container-image-pipelines
   (:gen-class)
   (:require [clojure.java.io :as io]
-            [clojure.pprint :refer [pprint]]
+
             [clojure.string :as string]
 
             [clojure.tools.cli :refer [parse-opts]]
@@ -255,7 +255,7 @@ images when patching a root base image.")
                     :only-local-platform false
                     :secure-manifest-inspections true
                     :stop-on-first-error stop-on-first-error
-                    :extra-buid-args rest))))
+                    :extra-build-args rest))))
 
 (defn- upload-all-to-local-registry-command
   "Upload all remote images to a local registry, using the container store as an intermediary."

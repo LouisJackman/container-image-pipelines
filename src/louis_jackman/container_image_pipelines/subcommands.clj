@@ -128,31 +128,31 @@
   [& {:keys [project-dir registry secure-manifest-inspections]}]
 
   (let [checker (map->ImageExistenceChecker
-                 {:force-secure-inspections secure-manifest-inspections})
-        http-client (HttpClient/newHttpClient)]
-    (binding [*http-client* http-client]
-      (doseq [context (sort-contexts project-dir)]
-        (let [{:keys [version]} (lookup-context-info context)
-              image-name (name-from-context context)
-              image (map->ImageRef {:registry registry
-                                    :image-name image-name
-                                    :tag version})
-              image-string (ImageRef->string image)
-              latest (latest-ImageRef image)
-              latest-string (ImageRef->string latest)]
-          (if (registry-image-exists? image)
-            (do
+                 {:force-secure-inspections secure-manifest-inspections})]
+    (with-open [^HttpClient http-client (HttpClient/newHttpClient)]
+      (binding [*http-client* http-client]
+        (doseq [context (sort-contexts project-dir)]
+          (let [{:keys [version]} (lookup-context-info context)
+                image-name (name-from-context context)
+                image (map->ImageRef {:registry registry
+                                      :image-name image-name
+                                      :tag version})
+                image-string (ImageRef->string image)
+                latest (latest-ImageRef image)
+                latest-string (ImageRef->string latest)]
+            (if (registry-image-exists? image :with checker)
+              (do
+                (println (str image-string
+                              " exists on registry "
+                              registry
+                              "; pulling to the local store…"))
+                (check-proc (docker "pull" image-string))
+                (check-proc (docker "tag" image-string latest-string)))
               (println (str image-string
-                            " exists on registry "
+                            " is missing on the registry "
                             registry
-                            "; pulling to the local store…"))
-              (check-proc (docker "pull" image-string))
-              (check-proc (docker "tag" image-string latest-string)))
-            (println (str image-string
-                          " is missing on the registry "
-                          registry
-                          "; won't attempt to pull it into the local "
-                          "store"))))))))
+                            "; won't attempt to pull it into the local "
+                            "store")))))))))
 
 
 ;;;
@@ -168,39 +168,39 @@
              secure-manifest-inspections]}]
 
   (let [checker (map->ImageExistenceChecker
-                 {:force-secure-inspections secure-manifest-inspections})
-        http-client (HttpClient/newHttpClient)]
-    (binding [*http-client* http-client]
-      (doseq [context (sort-contexts project-dir)]
-        (let [{:keys [version]} (lookup-context-info context)
-              image-name (name-from-context context)
-              remote-image (-> (map->ImageRef {:registry remote-registry
-                                               :image-name image-name
-                                               :tag version})
-                               ImageRef->string)
-              local-image (map->ImageRef {:registry local-registry
-                                          :image-name image-name
-                                          :tag version})
-              local-image-string (ImageRef->string local-image)
-              latest-local-image (-> local-image
-                                     latest-ImageRef
-                                     ImageRef->string)]
-          (if (local-image-exists? local-image)
-            (println (str local-image-string
-                          " already exists on the local registry "
-                          local-registry
-                          "; skipping…"))
-            (do
+                 {:force-secure-inspections secure-manifest-inspections})]
+    (with-open [^HttpClient http-client (HttpClient/newHttpClient)]
+      (binding [*http-client* http-client]
+        (doseq [context (sort-contexts project-dir)]
+          (let [{:keys [version]} (lookup-context-info context)
+                image-name (name-from-context context)
+                remote-image (-> (map->ImageRef {:registry remote-registry
+                                                  :image-name image-name
+                                                  :tag version})
+                                  ImageRef->string)
+                local-image (map->ImageRef {:registry local-registry
+                                             :image-name image-name
+                                             :tag version})
+                local-image-string (ImageRef->string local-image)
+                latest-local-image (-> local-image
+                                        latest-ImageRef
+                                        ImageRef->string)]
+            (if (local-image-exists? local-image)
               (println (str local-image-string
-                            " is missing on the local registry "
+                            " already exists on the local registry "
                             local-registry
-                            "; pushing…"))
-              (check-proc (docker "pull" remote-image))
-              (check-proc (docker "tag" remote-image local-image-string))
-              (check-proc (docker "tag" remote-image latest-local-image))
-              (check-proc (docker "rmi" remote-image))
-              (check-proc (docker "push" local-image-string))
-              (check-proc (docker "push" latest-local-image)))))))))
+                            "; skipping…"))
+              (do
+                (println (str local-image-string
+                              " is missing on the local registry "
+                              local-registry
+                              "; pushing…"))
+                (check-proc (docker "pull" remote-image))
+                (check-proc (docker "tag" remote-image local-image-string))
+                (check-proc (docker "tag" remote-image latest-local-image))
+                (check-proc (docker "rmi" remote-image))
+                (check-proc (docker "push" local-image-string))
+                (check-proc (docker "push" latest-local-image))))))))))
 
 
 ;;;

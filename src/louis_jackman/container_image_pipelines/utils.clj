@@ -19,13 +19,15 @@
    :out :inherit
    :err :inherit})
 
-(defn wait-for-proc [proc]
+(defn wait-for-proc
   "Wait for a process to finish."
+  [proc]
   @(process/exit-ref proc))
 
-(defn check-proc [^Process proc]
+(defn check-proc
   "Wait for a process to finish. Throw an exception if its status code
   indicates failure, i.e. not 0."
+  [^Process proc]
   (let [status (wait-for-proc proc)
         command (-> proc .info .commandLine (.orElse nil))]
     (if-not (zero? status)

@@ -48,7 +48,7 @@
                                 io/reader
                                 line-seq
                                 (filter #(string/includes? % missing-provenance-err-msg))
-                                not)]
+                                empty?)]
        (and (zero? (wait-for-proc proc))
             supports-provenance)))))
 
